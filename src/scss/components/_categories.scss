@@ -17,9 +17,14 @@
       transition: background-color 0.1s ease-in-out;
       @include noselect();
 
+      @media (max-width: 1275px) {
+        margin-top: 15px;
+      }
+
       @media (max-width: 1015px) {
         flex-wrap: wrap;
         margin-bottom: 15px;
+        margin-top: 15px;
       }
 
       &:hover {
