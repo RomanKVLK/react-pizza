@@ -14,13 +14,15 @@ import { SearchContext } from '../App';
 
 const Home = () => {
   const categoryId = useSelector((state) => state.filter.categoryId);
-  const items = useSelector((state) => state.pizza.items);
+  const { items, status } = useSelector((state) => state.pizza);
   const sortType = useSelector((state) => state.filter.sort.sortProperty);
   const currentPage = useSelector((state) => state.filter.currentPage);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = React.useState(true);
+  const itemsPizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
+  const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
+  const sortBy = sortType;
 
   const onChangeCategory = (id) => {
     dispatch(setCategoryId(id));
@@ -31,15 +33,9 @@ const Home = () => {
   };
 
   const { searchValue } = React.useContext(SearchContext);
-
-  const itemsPizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
-  const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
   const search = searchValue ? `&search=${searchValue}` : '';
-  const sortBy = sortType.sortProperty;
 
   const getPizzas = async () => {
-    setIsLoading(true);
-
     dispatch(
       fetchPizza({
         search,
@@ -48,24 +44,24 @@ const Home = () => {
         categoryId,
       }),
     );
-    setIsLoading(false);
 
     window.scrollTo(0, 0);
   };
 
   React.useEffect(() => {
     getPizzas();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue, currentPage, sortBy, categoryId]);
 
   React.useEffect(() => {
     const queryString = qs.stringify({
-      sortProperty: sortType,
+      sortBy,
       categoryId,
       currentPage,
     });
 
     navigate(`?${queryString}`);
-  }, [categoryId, sortType, searchValue, currentPage, navigate]);
+  }, [categoryId, searchValue, currentPage, navigate, sortBy]);
 
   return (
     <>
@@ -74,7 +70,14 @@ const Home = () => {
         <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
-      <div className="content__items">{isLoading ? skeletons : itemsPizzas}</div>
+      {status === 'error' ? (
+        <div className="content__error-info">
+          <h2>Произошла ошибка 😕</h2>
+          <p>К сожалению, не удалось получить пиццы. Попробуйте повторить попытку позже.</p>
+        </div>
+      ) : (
+        <div className="content__items">{status === 'loading' ? skeletons : itemsPizzas}</div>
+      )}
       <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </>
   );
