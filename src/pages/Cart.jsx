@@ -5,10 +5,11 @@ import { clearItems } from '../redux/slices/cartSlice';
 
 import CartItem from '../components/CartItem';
 import CartEmpty from '../components/CartEmpty';
+import { selectCart } from '../redux/slices/pizzaSlice';
 
 const Cart = () => {
   const dispatch = useDispatch();
-  const { items, totalPrice } = useSelector((state) => state.cart);
+  const { items, totalPrice } = useSelector(selectCart);
 
   const onClickClear = () => {
     if (window.confirm('Очистить корзину?')) {

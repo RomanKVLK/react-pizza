@@ -10,13 +10,13 @@ import Sort from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock/index';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { SearchContext } from '../App';
 
 const Home = () => {
   const categoryId = useSelector((state) => state.filter.categoryId);
   const { items, status } = useSelector((state) => state.pizza);
   const sortType = useSelector((state) => state.filter.sort.sortProperty);
   const currentPage = useSelector((state) => state.filter.currentPage);
+  const searchValue = useSelector((state) => state.filter.searchValue);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -32,7 +32,6 @@ const Home = () => {
     dispatch(setCurrentPage(number));
   };
 
-  const { searchValue } = React.useContext(SearchContext);
   const search = searchValue ? `&search=${searchValue}` : '';
 
   const getPizzas = async () => {

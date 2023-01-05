@@ -33,12 +33,14 @@ const pizzaSlice = createSlice({
       state.items = action.payload;
       state.status = 'success';
     },
-    [fetchPizza.rejected]: (state, action) => {
+    [fetchPizza.rejected]: (state) => {
       state.status = 'error';
       state.items = [];
     },
   },
 });
+
+export const selectCart = (state) => state.cart;
 
 export const { setItems } = pizzaSlice.actions;
 
