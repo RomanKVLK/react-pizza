@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import qs from 'qs';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { setCategoryId, setCurrentPage } from '../redux/slices/filterSlice';
 import { fetchPizza } from '../redux/slices/pizzaSlice';
@@ -20,7 +20,11 @@ const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const itemsPizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
+  const itemsPizzas = items.map((obj) => (
+    <Link key={obj.id} to={`pizza/${obj.id}`}>
+      <PizzaBlock key={obj.id} {...obj} />
+    </Link>
+  ));
   const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
   const sortBy = sortType;
 
