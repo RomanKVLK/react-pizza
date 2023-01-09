@@ -11,16 +11,16 @@ import PizzaBlock from '../components/PizzaBlock/index';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
 
-const Home = () => {
-  const categoryId = useSelector((state) => state.filter.categoryId);
-  const { items, status } = useSelector((state) => state.pizza);
-  const sortType = useSelector((state) => state.filter.sort.sortProperty);
-  const currentPage = useSelector((state) => state.filter.currentPage);
-  const searchValue = useSelector((state) => state.filter.searchValue);
+const Home: React.FC = () => {
+  const categoryId = useSelector((state: any) => state.filter.categoryId);
+  const { items, status } = useSelector((state: any) => state.pizza);
+  const sortType = useSelector((state: any) => state.filter.sort.sortProperty);
+  const currentPage = useSelector((state: any) => state.filter.currentPage);
+  const searchValue = useSelector((state: any) => state.filter.searchValue);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const itemsPizzas = items.map((obj) => (
+  const itemsPizzas = items.map((obj: any) => (
     <Link key={obj.id} to={`pizza/${obj.id}`}>
       <PizzaBlock key={obj.id} {...obj} />
     </Link>
@@ -28,18 +28,19 @@ const Home = () => {
   const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
   const sortBy = sortType;
 
-  const onChangeCategory = (id) => {
+  const onChangeCategory = (id: number) => {
     dispatch(setCategoryId(id));
   };
 
-  const onChangePage = (number) => {
-    dispatch(setCurrentPage(number));
+  const onChangePage = (page: number) => {
+    dispatch(setCurrentPage(page));
   };
 
   const search = searchValue ? `&search=${searchValue}` : '';
 
   const getPizzas = async () => {
     dispatch(
+      // @ts-ignore
       fetchPizza({
         search,
         currentPage,
@@ -69,7 +70,7 @@ const Home = () => {
   return (
     <>
       <div className="content__top">
-        <Categories value={categoryId} onChangeCategory={(i) => onChangeCategory(i)} />
+        <Categories value={categoryId} onChangeCategory={(i: number) => onChangeCategory(i)} />
         <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
