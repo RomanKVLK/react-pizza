@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSort } from '../redux/slices/filterSlice';
+import { setSort } from '../redux/slices/filter/slice';
 import { RootState } from '../redux/store';
 
 type SortItem = {
@@ -14,7 +14,7 @@ export const list: SortItem[] = [
   { name: 'алфавиту', sortProperty: 'title' },
 ];
 
-const Sort: React.FC = () => {
+const Sort: React.FC = React.memo(() => {
   const dispatch = useDispatch();
   const sort = useSelector((state: RootState) => state.filter.sort);
   const [open, setOpen] = React.useState(false);
@@ -73,6 +73,6 @@ const Sort: React.FC = () => {
       )}
     </div>
   );
-}
+})
 
 export default Sort;

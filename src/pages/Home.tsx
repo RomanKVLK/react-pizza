@@ -1,15 +1,17 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../redux/store';
 import qs from 'qs';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { setCategoryId, setCurrentPage } from '../redux/slices/filterSlice';
-import { fetchPizza } from '../redux/slices/pizzaSlice';
+import { setCategoryId, setCurrentPage } from '../redux/slices/filter/slice';
+import { fetchPizza} from '../redux/slices/pizza/asyncActions';
 import Categories from '../components/Categories';
 import Sort from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock/index';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
+import { Status } from '../redux/slices/pizza/types';
 
 const Home: React.FC = () => {
   const categoryId = useSelector((state: any) => state.filter.categoryId);
@@ -17,30 +19,27 @@ const Home: React.FC = () => {
   const sortType = useSelector((state: any) => state.filter.sort.sortProperty);
   const currentPage = useSelector((state: any) => state.filter.currentPage);
   const searchValue = useSelector((state: any) => state.filter.searchValue);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const itemsPizzas = items.map((obj: any) => (
-    <Link key={obj.id} to={`pizza/${obj.id}`}>
       <PizzaBlock key={obj.id} {...obj} />
-    </Link>
   ));
   const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
   const sortBy = sortType;
 
-  const onChangeCategory = (id: number) => {
+  const onChangeCategory = React.useCallback((id: number) => {
     dispatch(setCategoryId(id));
-  };
+  }, [dispatch]);
 
-  const onChangePage = (page: number) => {
+  function onChangePage(page: number) {
     dispatch(setCurrentPage(page));
-  };
+  }
 
   const search = searchValue ? `&search=${searchValue}` : '';
 
   const getPizzas = async () => {
     dispatch(
-      // @ts-ignore
       fetchPizza({
         search,
         currentPage,
@@ -54,7 +53,7 @@ const Home: React.FC = () => {
 
   React.useEffect(() => {
     getPizzas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, currentPage, sortBy, categoryId]);
 
   React.useEffect(() => {
@@ -74,13 +73,13 @@ const Home: React.FC = () => {
         <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
-      {status === 'error' ? (
+      {status === Status.ERROR ? (
         <div className="content__error-info">
           <h2>Произошла ошибка 😕</h2>
           <p>К сожалению, не удалось получить пиццы. Попробуйте повторить попытку позже.</p>
         </div>
       ) : (
-        <div className="content__items">{status === 'loading' ? skeletons : itemsPizzas}</div>
+        <div className="content__items">{status === Status.LOADING ? skeletons : itemsPizzas}</div>
       )}
       <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </>
