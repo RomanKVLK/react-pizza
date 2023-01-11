@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../redux/store';
+import { RootState, useAppDispatch } from '../redux/store';
 import qs from 'qs';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,20 +12,21 @@ import PizzaBlock from '../components/PizzaBlock/index';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
 import { Status } from '../redux/slices/pizza/types';
+import NotFoundBlock from '../components/NotFoundBlock/NotFoundBlock';
 
 const Home: React.FC = () => {
   const categoryId = useSelector((state: any) => state.filter.categoryId);
-  const { items, status } = useSelector((state: any) => state.pizza);
-  const sortType = useSelector((state: any) => state.filter.sort.sortProperty);
+  const { items, status } = useSelector((state: RootState) => state.pizza);
+  const sortType = useSelector((state: RootState) => state.filter.sort.sortProperty);
   const currentPage = useSelector((state: any) => state.filter.currentPage);
-  const searchValue = useSelector((state: any) => state.filter.searchValue);
+  const searchValue = useSelector((state: RootState) => state.filter.searchValue);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const itemsPizzas = items.map((obj: any) => (
+  const itemsPizzas = items.map((obj) => (
       <PizzaBlock key={obj.id} {...obj} />
   ));
-  const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
+  const skeletons = [...new Array(8)].map((_, index) => <Skeleton key={index} />);
   const sortBy = sortType;
 
   const onChangeCategory = React.useCallback((id: number) => {
@@ -36,6 +37,7 @@ const Home: React.FC = () => {
     dispatch(setCurrentPage(page));
   }
 
+  
   const search = searchValue ? `&search=${searchValue}` : '';
 
   const getPizzas = async () => {
@@ -51,10 +53,14 @@ const Home: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
+
+
   React.useEffect(() => {
     getPizzas();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, currentPage, sortBy, categoryId]);
+
+  const valueSearch = searchValue === '' || items.length > 0;
 
   React.useEffect(() => {
     const queryString = qs.stringify({
@@ -72,18 +78,21 @@ const Home: React.FC = () => {
         <Categories value={categoryId} onChangeCategory={(i: number) => onChangeCategory(i)} />
         <Sort />
       </div>
-      <h2 className="content__title">Все пиццы</h2>
-      {status === Status.ERROR ? (
+      {(valueSearch) && <h2 className="content__title">Все пиццы</h2>}
+      {valueSearch ? 
+      (status === Status.ERROR) ? (
         <div className="content__error-info">
           <h2>Произошла ошибка 😕</h2>
           <p>К сожалению, не удалось получить пиццы. Попробуйте повторить попытку позже.</p>
         </div>
       ) : (
         <div className="content__items">{status === Status.LOADING ? skeletons : itemsPizzas}</div>
-      )}
+      ) : <NotFoundBlock />}
       <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </>
   );
 };
 
 export default Home;
+
+// searchValue === '' || items.length > 0

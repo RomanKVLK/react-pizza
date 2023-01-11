@@ -11,3 +11,4 @@ export const fetchPizza = createAsyncThunk<Pizza[], Record<string, string>>('piz
     );
     return data;
   });
+
